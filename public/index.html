@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Flujo Conversacional - Asistente Virtual IGM</title>
+<style>
+  :root{
+    --bg:#0b1220;--text:#e7ecf7;--muted:#9aa6c4;
+    --pasaportes:#3b82f6;--pasaportes-bg:#14213d;--pasaportes-detail:#0d1730;
+    --extranjeria:#a855f7;--extranjeria-bg:#241332;--extranjeria-detail:#190d24;
+    --control:#f59e0b;--control-bg:#2b1d0c;--control-detail:#1f1408;
+    --info:#14b8a6;--info-bg:#0c2624;--info-detail:#081b19;
+    --agente:#ef4444;--agente-bg:#2b1212;--agente-detail:#1f0d0d;
+    --line:#334155;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;margin:0;padding:24px 28px 70px;}
+  h1{font-size:21px;margin:0 0 2px;}
+  p.sub{color:var(--muted);margin:0 0 18px;font-size:13px;}
+  .legend{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:22px;font-size:12px;}
+  .legend-group{display:flex;flex-direction:column;gap:6px;}
+  .legend-title{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;margin-right:14px;}
+  .dot{width:11px;height:11px;border-radius:4px;display:inline-block;}
+  .dotc{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  .tree{list-style:none;padding-left:0;}
+  .tree ul{list-style:none;padding-left:26px;border-left:1px dashed var(--line);margin:8px 0 8px 12px;}
+  li{margin:8px 0;}
+  .node{border-radius:10px;padding:10px 15px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13.5px;transition:filter .15s,transform .1s;max-width:880px;border:1.5px solid transparent;}
+  .node:hover{filter:brightness(1.15);transform:translateX(2px);}
+  .node .id{font-weight:700;min-width:60px;font-family:monospace;opacity:.9;}
+  .node .label{flex:1;font-weight:600;}
+  .toggle{width:14px;text-align:center;color:var(--muted);font-size:11px;}
+  .badge{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.15);}
+  .badge.menu{background:#f59e0b;}.badge.final{background:#22c55e;}.badge.transfer{background:#ef4444;}
+  .badge.check{background:#6366f1;}.badge.offline{background:#64748b;}
+  .cat-pasaportes{background:var(--pasaportes-bg);border-color:#2a4d8f;}.cat-pasaportes .id{color:var(--pasaportes);}
+  .cat-extranjeria{background:var(--extranjeria-bg);border-color:#6b30a3;}.cat-extranjeria .id{color:var(--extranjeria);}
+  .cat-control{background:var(--control-bg);border-color:#a3690e;}.cat-control .id{color:var(--control);}
+  .cat-info{background:var(--info-bg);border-color:#117f70;}.cat-info .id{color:var(--info);}
+  .cat-agente{background:var(--agente-bg);border-color:#a32a2a;}.cat-agente .id{color:var(--agente);}
+  .cat-agente-pasaportes,.cat-agente-extranjeria,.cat-agente-control,.cat-agente-info{background:#160f20;border-color:#4b3a7a;}
+  .cat-agente-pasaportes .id,.cat-agente-extranjeria .id,.cat-agente-control .id,.cat-agente-info .id{color:#818cf8;}
+  .cat-root{background:#1e293b;border-color:#475569;}
+  .detail{display:none;margin:10px 0 0 30px;padding:16px 18px;border-radius:12px;font-size:13px;max-width:800px;line-height:1.65;box-shadow:0 10px 28px rgba(0,0,0,.45);border:1px solid;position:relative;}
+  .detail.open{display:block;}
+  .detail::before{content:"";position:absolute;left:-13px;top:18px;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;}
+  .detail-pasaportes{background:var(--pasaportes-detail);border-color:#2a4d8f;}.detail-pasaportes::before{border-right:13px solid var(--pasaportes-detail);}
+  .detail-extranjeria{background:var(--extranjeria-detail);border-color:#6b30a3;}.detail-extranjeria::before{border-right:13px solid var(--extranjeria-detail);}
+  .detail-control{background:var(--control-detail);border-color:#a3690e;}.detail-control::before{border-right:13px solid var(--control-detail);}
+  .detail-info{background:var(--info-detail);border-color:#117f70;}.detail-info::before{border-right:13px solid var(--info-detail);}
+  .detail-agente{background:var(--agente-detail);border-color:#a32a2a;}.detail-agente::before{border-right:13px solid var(--agente-detail);}
+  .detail-agente-pasaportes,.detail-agente-extranjeria,.detail-agente-control,.detail-agente-info{background:#0e0b18;border-color:#4b3a7a;}
+  .detail-agente-pasaportes::before,.detail-agente-extranjeria::before,.detail-agente-control::before,.detail-agente-info::before{border-right:13px solid #0e0b18;}
+  .detail-root{background:#161f33;border-color:#475569;}.detail-root::before{border-right:13px solid #161f33;}
+  .detail .section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:var(--muted);margin-bottom:6px;margin-top:12px;}
+  .detail .section-label:first-child{margin-top:0;}
+  .detail .bot-text{color:#fff;white-space:pre-line;font-size:13.5px;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;border-left:3px solid currentColor;}
+  .detail a{color:#7dd3fc;text-decoration:none;border-bottom:1px dotted #7dd3fc;}
+  .intents-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+  .intent-pill{background:rgba(255,255,255,.07);color:#c7d2e8;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:3px 10px;font-size:11.5px;}
+  .next-row{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:11.5px;color:var(--muted);}
+  .next-pill{padding:3px 9px;border-radius:6px;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;}
+  .next-pill.menu{background:rgba(245,158,11,.18);color:#fbbf24;}
+  .next-pill.final{background:rgba(34,197,94,.18);color:#4ade80;}
+  .next-pill.transfer{background:rgba(239,68,68,.18);color:#f87171;}
+  .next-pill.check{background:rgba(99,102,241,.18);color:#a5b4fc;}
+  .next-pill.offline{background:rgba(100,116,139,.18);color:#94a3b8;}
+  .flow-step{display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:999px;padding:2px 10px;font-size:11px;color:#a5b4fc;margin-bottom:8px;}
+  .children{display:none;}.children.open{display:block;}
+  .controls{margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  button.ctrl{background:#1e293b;border:1px solid var(--line);color:var(--text);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;}
+  button.ctrl:hover{filter:brightness(1.2);}
+  #loading{text-align:center;padding:60px;color:var(--muted);}
+  #error-msg{background:#2b1212;border:1px solid #7f1d1d;color:#fca5a5;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:none;}
+</style>
+</head>
+<body>
+<h1>🇬🇹 Asistente Virtual IGM — Flujo Conversacional</h1>
+<p class="sub">Widget web del sitio del IGM. Clic en cada nodo para ver el texto completo del bot e intenciones.</p>
+<div class="legend">
+  <div class="legend-group">
+    <div class="legend-title">Categoría</div>
+    <span><span class="dot" style="background:var(--pasaportes)"></span>🛂 Pasaportes</span>
+    <span><span class="dot" style="background:var(--extranjeria)"></span>🌍 Extranjería</span>
+    <span><span class="dot" style="background:var(--control)"></span>🛃 Control Migratorio</span>
+    <span><span class="dot" style="background:var(--info)"></span>ℹ️ Información general</span>
+    <span><span class="dot" style="background:var(--agente)"></span>🧑‍💼 Agente humano</span>
+  </div>
+  <div class="legend-group">
+    <div class="legend-title">Tipo de nodo</div>
+    <span><span class="dotc" style="background:#f59e0b"></span> Abre submenú</span>
+    <span><span class="dotc" style="background:#22c55e"></span> Respuesta final</span>
+    <span><span class="dotc" style="background:#ef4444"></span> Transfiere a agente</span>
+    <span><span class="dotc" style="background:#6366f1"></span> Validación / lógica</span>
+    <span><span class="dotc" style="background:#64748b"></span> Fuera de horario</span>
+  </div>
+</div>
+<div id="error-msg"></div>
+<div class="controls">
+  <button class="ctrl" onclick="toggleAll(true)">Expandir todo</button>
+  <button class="ctrl" onclick="toggleAll(false)">Colapsar todo</button>
+</div>
+<div id="loading">⏳ Cargando flujo...</div>
+<ul class="tree" id="tree"></ul>
+
+<script>
+const typeLabels={menu:{cls:'menu',label:'Abre más opciones'},transfer:{cls:'transfer',label:'Transfiere a agente'},final:{cls:'final',label:'Respuesta final'},check:{cls:'check',label:'Validación / lógica interna'},offline:{cls:'offline',label:'Fin de rama (sin atención)'}};
+
+function buildNode(node){
+  const li=document.createElement('li');
+  const hasChildren=node.children&&node.children.length;
+  const div=document.createElement('div');
+  div.className=`node cat-${node.cat}`;
+  div.dataset.id=node.id;
+  div.innerHTML=`<span class="toggle">${hasChildren?'▸':'•'}</span><span class="badge ${node.type}"></span><span class="id">${node.id}</span><span class="label">${node.label}</span>`;
+  const detail=document.createElement('div');
+  detail.className=`detail detail-${node.cat}`;
+  const intentsHtml=node.intents&&node.intents.length?`<div class="section-label">Intenciones / palabras clave</div><div class="intents-wrap">${node.intents.map(k=>`<span class="intent-pill">${k}</span>`).join('')}</div>`:'';
+  const next=typeLabels[node.type]||typeLabels.final;
+  detail.innerHTML=`<div class="section-label">Texto que responde el asistente</div><div class="bot-text">${node.detail||''}</div>${intentsHtml}<div class="next-row"><span>¿Qué pasa después?</span><span class="next-pill ${next.cls}">${next.label}</span></div>`;
+  let childrenUl;
+  if(hasChildren){childrenUl=document.createElement('ul');childrenUl.className='children';node.children.forEach(c=>childrenUl.appendChild(buildNode(c)));}
+  div.addEventListener('click',()=>{detail.classList.toggle('open');if(childrenUl){childrenUl.classList.toggle('open');div.querySelector('.toggle').textContent=childrenUl.classList.contains('open')?'▾':'▸';}});
+  li.appendChild(div);li.appendChild(detail);if(childrenUl)li.appendChild(childrenUl);
+  return li;
+}
+
+async function loadFlow(){
+  try{
+    const res=await fetch('/api/flow');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();
+    document.getElementById('loading').style.display='none';
+    const tree=document.getElementById('tree');
+    tree.innerHTML='';
+    tree.appendChild(buildNode(data));
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    const err=document.getElementById('error-msg');
+    err.style.display='block';
+    err.textContent=`Error al cargar el flujo: ${e.message}`;
+  }
+}
+
+function toggleAll(open){
+  document.querySelectorAll('.children').forEach(el=>el.classList.toggle('open',open));
+  document.querySelectorAll('.detail').forEach(el=>el.classList.toggle('open',open));
+  document.querySelectorAll('.toggle').forEach(el=>{if(el.textContent!=='•')el.textContent=open?'▾':'▸';});
+}
+
+loadFlow();
+</script>
+</body>
+</html>
