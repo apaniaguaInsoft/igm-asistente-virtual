@@ -60,7 +60,8 @@
   /* edit mode */
   body.edit-mode .node:hover{outline:2px dashed #3b82f6;outline-offset:2px;}
   body.edit-mode .node.selected{outline:2px solid #3b82f6;outline-offset:2px;filter:brightness(1.25);}
-  .edit-badge{display:none;font-size:10px;background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 5px;margin-left:6px;}
+  .edit-badge{display:none;font-size:12px;font-weight:600;background:#1d4ed8;color:#fff;border-radius:6px;padding:5px 12px;margin-left:6px;cursor:pointer;border:none;flex-shrink:0;}
+  .edit-badge:hover{background:#2563eb;}
   body.edit-mode .edit-badge{display:inline;}
   .btn-add-child{display:none;margin-left:auto;background:#14301a;border:1px solid #166534;color:#86efac;border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;flex-shrink:0;}
   body.edit-mode .btn-add-child{display:inline-block;}
@@ -279,16 +280,12 @@ function buildNode(node){
   div.addEventListener('click',(e)=>{
     const addBtn=e.target.closest('.btn-add-child');
     const delBtn=e.target.closest('.btn-del-node');
+    const editBtn=e.target.closest('.edit-badge');
     if(addBtn){e.stopPropagation();addChild(addBtn.dataset.id);return;}
     if(delBtn){e.stopPropagation();deleteNode(delBtn.dataset.id);return;}
-    if(e.target.closest('.toggle')){
-      detail.classList.toggle('open');
-      if(childrenUl){childrenUl.classList.toggle('open');div.querySelector('.toggle').textContent=childrenUl.classList.contains('open')?'▾ Colapsar':'▸ Expandir';}
-      return;
-    }
-    document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected'));
-    div.classList.add('selected');
-    openEditor(node);
+    if(editBtn){e.stopPropagation();document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected'));div.classList.add('selected');openEditor(node);return;}
+    detail.classList.toggle('open');
+    if(childrenUl){childrenUl.classList.toggle('open');div.querySelector('.toggle').textContent=childrenUl.classList.contains('open')?'▾ Colapsar':'▸ Expandir';}
   });
   li.appendChild(div);li.appendChild(detail);if(childrenUl)li.appendChild(childrenUl);
   return li;
