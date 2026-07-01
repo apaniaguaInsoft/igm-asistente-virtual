@@ -76,7 +76,6 @@ function agentSubflow(dept, cat, idPrefix) {
       ]}
     ]}
   };
-}
 
 const DEFAULT_FLOW = {
   id:"1", label:"Mensaje inicial del asistente", type:"menu", cat:"root",
