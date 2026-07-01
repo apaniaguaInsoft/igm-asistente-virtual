@@ -1,4 +1,5 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+const kv = Redis.fromEnv();
 
 // GET  /api/flow        → devuelve el JSON del flujo
 // POST /api/flow        → guarda el JSON (requiere token admin)
