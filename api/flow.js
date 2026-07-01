@@ -1,11 +1,12 @@
-import { Redis } from '@upstash/redis';
-const kv = Redis.fromEnv();
+const { Redis } = require('@upstash/redis');
 
 // GET  /api/flow        → devuelve el JSON del flujo
 // POST /api/flow        → guarda el JSON (requiere token admin)
 // POST /api/flow/reset  → resetea al default (requiere token admin)
 
-export default async function handler(req, res) {
+const kv = Redis.fromEnv();
+
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-token');
