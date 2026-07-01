@@ -44,7 +44,8 @@
   .node:hover{filter:brightness(1.15);}
   .node .id{font-weight:700;min-width:60px;font-family:monospace;opacity:.9;}
   .node .label{flex:1;font-weight:600;}
-  .toggle{width:14px;text-align:center;color:var(--muted);font-size:11px;}
+  .toggle{min-width:80px;text-align:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:3px 8px;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer;flex-shrink:0;}
+  .toggle.dot{min-width:14px;background:none;border:none;padding:0;color:var(--muted);}
   .badge{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.15);}
   .badge.menu{background:#f59e0b;}.badge.final{background:#22c55e;}.badge.transfer{background:#ef4444;}
   .badge.check{background:#6366f1;}.badge.offline{background:#64748b;}
@@ -267,7 +268,7 @@ function buildNode(node){
   const div=document.createElement('div');
   div.className=`node cat-${node.cat}`;
   div.dataset.id=node.id;
-  div.innerHTML=`<span class="toggle">${hasChildren?'▸':'•'}</span><span class="badge ${node.type}"></span><span class="id">${node.id}</span><span class="label">${node.label}</span><span class="edit-badge">editar</span><button class="btn-add-child" data-id="${node.id}">＋ hijo</button><button class="btn-del-node" data-id="${node.id}">✕</button>`;
+  div.innerHTML=`<span class="toggle${hasChildren?'':' dot'}">${hasChildren?'▸ Expandir':'•'}</span><span class="badge ${node.type}"></span><span class="id">${node.id}</span><span class="label">${node.label}</span><span class="edit-badge">editar</span><button class="btn-add-child" data-id="${node.id}">＋ hijo</button><button class="btn-del-node" data-id="${node.id}">✕</button>`;
   const detail=document.createElement('div');
   detail.className=`detail detail-${node.cat}`;
   const intentsHtml=node.intents&&node.intents.length?`<div class="section-label">Intenciones / palabras clave</div><div class="intents-wrap">${node.intents.map(k=>`<span class="intent-pill">${k}</span>`).join('')}</div>`:'';
@@ -282,7 +283,7 @@ function buildNode(node){
     if(delBtn){e.stopPropagation();deleteNode(delBtn.dataset.id);return;}
     if(e.target.closest('.toggle')){
       detail.classList.toggle('open');
-      if(childrenUl){childrenUl.classList.toggle('open');div.querySelector('.toggle').textContent=childrenUl.classList.contains('open')?'▾':'▸';}
+      if(childrenUl){childrenUl.classList.toggle('open');div.querySelector('.toggle').textContent=childrenUl.classList.contains('open')?'▾ Colapsar':'▸ Expandir';}
       return;
     }
     document.querySelectorAll('.node.selected').forEach(n=>n.classList.remove('selected'));
@@ -317,7 +318,7 @@ function renderTree(state){
 function toggleAll(open){
   document.querySelectorAll('.children').forEach(el=>el.classList.toggle('open',open));
   document.querySelectorAll('.detail').forEach(el=>el.classList.toggle('open',open));
-  document.querySelectorAll('.toggle').forEach(el=>{if(el.textContent!=='•')el.textContent=open?'▾':'▸';});
+  document.querySelectorAll('.toggle:not(.dot)').forEach(el=>{el.textContent=open?'▾ Colapsar':'▸ Expandir';});
 }
 
 // ── Editor ────────────────────────────────────────────────────
