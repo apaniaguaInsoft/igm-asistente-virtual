@@ -61,10 +61,10 @@ function agentSubflow(dept, cat, idPrefix) {
     detail:`Con mucho gusto le ayudo a conectarle con un agente especializado en ${deptName}. Permítame un momento para verificar la disponibilidad. 🔄`,
     children:[{
       id:`${idPrefix}.1`, label:"✅ Verificar horario de atención", type:"check", cat:deptCat, intents:[],
-      detail:`<span class="flow-step">⚙️ Paso 1 de 3 — Verificación de horario</span>\n\nEl bot verifica automáticamente la hora actual del sistema.\n\n📅 Horario de atención del área de ${deptName}:\nLunes a viernes — 7:00 a.m. a 3:00 p.m.\n\nSi la consulta se realiza dentro del horario → continúa al Paso 2.\nSi está fuera del horario → ramifica a nodo fuera de horario.`,
+      detail:`<span class="flow-step">⚙️ Paso 1 de 3 — Verificación de horario</span>\n\nEl bot verifica automáticamente la hora actual del sistema.\n\n📅 Horario de atención del área de ${deptName}:\nLunes a viernes de 7:00 a 13:00 horas y de 14:00 a 15:00 horas\n\nSi la consulta se realiza dentro del horario → continúa al Paso 2.\nSi está fuera del horario → ramifica a nodo fuera de horario.`,
       children:[
         { id:`${idPrefix}.1.1`, label:"⏰ Fuera de horario de atención", type:"offline", cat:deptCat, intents:[],
-          detail:`Lamentablemente en este momento nuestras oficinas se encuentran cerradas. 😔\n\nNuestro horario de atención en ${deptName} es:\n📅 Lunes a viernes de 7:00 a.m. a 3:00 p.m.\n\nPuede intentar nuevamente durante ese horario o utilizar las siguientes opciones de autoservicio:\n🔗 Portal web del IGM: https://igm.gob.gt\n📞 WhatsApp informativo: 3757-0902\n\n¿Desea que le envíe un resumen de la información que necesita? (1. Sí / 2. No, gracias)` },
+          detail:`Lamentablemente en este momento nuestras oficinas se encuentran cerradas. 😔\n\nNuestro horario de atención en ${deptName} es:\n📅 Lunes a viernes de 7:00 a 13:00 horas y de 14:00 a 15:00 horas\n\nPuede intentar nuevamente durante ese horario o utilizar las siguientes opciones de autoservicio:\n🔗 Portal web del IGM: https://igm.gob.gt\n📞 WhatsApp informativo: 3757-0902\n\n¿Desea que le envíe un resumen de la información que necesita? (1. Sí / 2. No, gracias)` },
         { id:`${idPrefix}.1.2`, label:"🟢 Dentro de horario → Verificar disponibilidad", type:"check", cat:deptCat, intents:[],
           detail:`<span class="flow-step">⚙️ Paso 2 de 3 — Verificación de agentes disponibles</span>\n\nEl bot consulta en tiempo real la cola de agentes asignados al área de ${deptName}.\n\nSi hay agentes disponibles → continúa al Paso 3.\nSi no hay agentes disponibles → informa al usuario.`,
           children:[
@@ -92,7 +92,7 @@ const DEFAULT_FLOW = {
           children:[
             { id:"1.1.1.1", label:"Ver requisitos para el día de la cita", type:"final", cat:"pasaportes",
               intents:["requisitos cita pasaporte","qué llevar a la cita"],
-              detail:`✅ DPI vigente\n✅ Boleta de pago Banrural\n✅ Constancia de cita impresa\n✅ Si es renovación: pasaporte anterior\n\nMás info: 🔗 ${L('https://igm.gob.gt/informacion-pasaportes/')}` },
+              detail:`✅ DPI vigente y fotocopia legible\n✅ Boleta de pago Banrural\n✅ Constancia de cita impresa\n✅ Si es renovación: pasaporte anterior\n\nMás info: 🔗 ${L('https://igm.gob.gt/informacion-pasaportes/')}` },
             { id:"1.1.1.2", label:"Si extravié o me robaron el pasaporte anterior", type:"final", cat:"pasaportes",
               intents:["perdí mi pasaporte","me robaron el pasaporte"],
               detail:`Requiere denuncia original PNC o MP, además de los requisitos habituales.\n\nCita: 🔗 ${L('https://servicios.igm.gob.gt/citasenlinea/')}` },
@@ -106,7 +106,7 @@ const DEFAULT_FLOW = {
           children:[
             { id:"1.1.2.1", label:"Ambos padres presentes en Guatemala", type:"final", cat:"pasaportes",
               intents:["ambos padres pasaporte menor"],
-              detail:`✅ Pago USD 50.00 (5 años, solo para menores)\n✅ DPI de ambos padres\n✅ Certificado de nacimiento (<6 meses)\n✅ Boleta de pago y constancia de cita\n\nMás info: 🔗 ${L('https://igm.gob.gt/requisitos-para-tramite-de-pasaportes-menores-de-edad/')}` },
+              detail:`✅ Pago USD 50.00 (5 años, solo para menores)\n✅ DPI de ambos padres y fotocopia legible\n✅ Certificado de nacimiento (<6 meses)\n✅ Boleta de pago y constancia de cita\n\nMás info: 🔗 ${L('https://igm.gob.gt/requisitos-para-tramite-de-pasaportes-menores-de-edad/')}` },
             { id:"1.1.2.2", label:"Un padre no puede asistir (dentro de Guatemala)", type:"final", cat:"pasaportes",
               intents:["papá no puede asistir","mamá no puede asistir"],
               detail:`✅ Mandato Especial con Representación (original y copia legalizada)\n✅ Copia simple del DPI del padre ausente` },
@@ -126,7 +126,7 @@ const DEFAULT_FLOW = {
           children:[
             { id:"1.1.4.1", label:"Programar una nueva cita", type:"final", cat:"pasaportes",
               intents:["sacar cita pasaporte","nueva cita","agendar cita"],
-              detail:`1. Pago en Banrural.\n2. Portal de citas: 🔗 ${L('https://servicios.igm.gob.gt/citasenlinea/')}\n3. Seleccionar fecha y hora.\n4. Imprimir constancia.\n\nHorario sedes: L-V 7am-3pm.` },
+              detail:`1. Pago en Banrural.\n2. Portal de citas: 🔗 ${L('https://servicios.igm.gob.gt/citasenlinea/')}\n3. Seleccionar fecha y hora.\n4. Imprimir constancia.\n\nHorario sedes: lunes a viernes de 7:00 a 15:00 horas.` },
             { id:"1.1.4.2", label:"Reprogramar una cita existente", type:"final", cat:"pasaportes",
               intents:["cambiar mi cita","reprogramar cita"],
               detail:`Necesita: boleta de pago, fecha de nacimiento y correlativo.\n\nReagendar: 🔗 ${L('https://servicios.igm.gob.gt/citasenlinea/modules/view/reagendar/')}\n\nSoporte: 2411-2411, ext. 124.` },
@@ -217,7 +217,7 @@ const DEFAULT_FLOW = {
           ]},
         { id:"1.3.2", label:"Movimientos migratorios", type:"final", cat:"control",
           intents:["movimiento migratorio","certificación de movimiento migratorio"],
-          detail:`1. Boleta Migrapagos en CHN: 🔗 ${L('https://migrapagos.igm.gob.gt/')} Costo: 💰 USD 10.00\n2. Solicitud: 🔗 ${L('https://servicios.igm.gob.gt/web/servicios/controlmigratorio/movimientomigratorio')}\n\nCertificación en 48-72h hábiles (L-V 7am-2:30pm).` },
+          detail:`1. Boleta Migrapagos en CHN: 🔗 ${L('https://migrapagos.igm.gob.gt/')} Costo: 💰 USD 10.00\n2. Solicitud: 🔗 ${L('https://servicios.igm.gob.gt/web/servicios/controlmigratorio/movimientomigratorio')}\n\nCertificación en 48-72h hábiles (lunes a viernes de 7:00 a 14:30 horas).` },
         { id:"1.3.3", label:"Registro migratorio (ingreso al país)", type:"final", cat:"control",
           intents:["ingreso al país","requisitos para entrar a guatemala"],
           detail:`✅ Pasaporte vigente\n✅ Visa (si aplica)\n✅ Entrevista en puesto migratorio\n✅ Solvencia económica\n✅ Reservación de hotel\n✅ Boleto de regreso\n\nMás info: 🔗 ${L('https://igm.gob.gt/requisitos-de-ingreso-a-territorio-guatemalteco/')}` },
@@ -255,10 +255,10 @@ const DEFAULT_FLOW = {
       children:[
         { id:"1.4.1", label:"Ubicaciones y horarios de sedes", type:"final", cat:"info",
           intents:["ubicación igm","dirección de oficinas","horario de atención"],
-          detail:`Oficinas Centrales: 6ª Av. 3-11, Zona 4, Ciudad de Guatemala. L-V 7am-3pm.\nSede Chiquimula: 7ª Av. 5-47, Zona 1. L-V 7am-3pm.\n\nSedes de emisión: 🔗 ${L('https://igm.gob.gt/ubicacion-de-centros-de-emision-de-pasaportes-y-horario/')}` },
+          detail:`Con mucho gusto le indicamos las ubicaciones y horarios de atención de nuestras sedes. Seleccione la sede de su interés para ver su dirección y horario:\n\n<details><summary>📍 Ciudad de Guatemala (Central)</summary>6ª Av. 3-11, Zona 4, Ciudad de Guatemala.<br>Lunes a viernes de 7:00 a 15:00 horas.</details>\n\n<details><summary>📍 Chiquimula</summary>7ª Av. 5-47, Zona 1, Chiquimula.<br>Lunes a viernes de 7:00 a 15:00 horas.</details>\n\nPara consultar la lista completa de sedes de emisión de pasaportes: 🔗 ${L('https://igm.gob.gt/ubicacion-de-centros-de-emision-de-pasaportes-y-horario/')}` },
         { id:"1.4.2", label:"Solicitud de refugio", type:"final", cat:"info",
           intents:["refugio","asilo","solicitar refugio"],
-          detail:`✅ Correo: drer@igm.gob.gt\n✅ Tel: 2231-7200 / 2411-2411 (ext. 185, 198, 200, 201)\n✅ Ubicación: 7ª Av. 14-44, Zona 9, Edificio La Galería, 2do. Nivel, Of. 15B` },
+          detail:`Entendemos que solicitar refugio puede ser un momento difícil, y queremos que sepa que el IGM está aquí para orientarle con toda la atención y discreción que usted merece. 🤝\n\nNuestro equipo especializado en la Dirección de Refugio y Estatuto de Refugiado está disponible para atenderle y acompañarle durante el proceso. Puede contactarnos por cualquiera de los siguientes medios:\n\n✅ Correo electrónico: drer@igm.gob.gt\n✅ Teléfonos: 2231-7200 / 2411-2411 (extensiones 185, 198, 200 y 201)\n✅ Ubicación: 7ª Av. 14-44, Zona 9, Edificio La Galería, 2do. Nivel, Oficina 15B\n\nTambién puede presentarse personalmente en nuestras instalaciones durante el horario de atención, donde uno de nuestros agentes especializados le recibirá y orientará en cada paso del proceso.` },
         { id:"1.4.3", label:"Viajeros centroamericanos (sin pasaporte)", type:"final", cat:"info",
           intents:["viajar sin pasaporte","ir a el salvador con dpi"],
           detail:`Mayores de edad pueden viajar a El Salvador, Honduras y Nicaragua solo con DPI (vía terrestre).\n\n⚠️ Vía aérea o menores: pasaporte obligatorio.` },
