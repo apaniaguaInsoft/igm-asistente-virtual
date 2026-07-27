@@ -1,0 +1,37 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-1-global-blocks",
+  "prompt": "Aplica el Phase 1 del plan de mejora a los bloques globales: menu_principal, bienvenida, defaultFallback y timeout_inactividad.",
+  "assertions": [
+    {
+      "text": "El texto de menu_principal usa 'tú' (no 'usted'/'ayudarle')",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "El texto de bienvenida es inclusivo de género (Bienvenido/a o similar)",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "El texto de defaultFallback incluye una frase de empatía antes de la acción",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "El texto de timeout_inactividad suena como una explicación humana, no una notificación de sistema",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "El JSON resultante es válido (sin errores de sintaxis)",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "Los intent_id originales no fueron modificados",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}

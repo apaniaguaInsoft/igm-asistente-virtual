@@ -124,6 +124,25 @@
   #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1d4ed8;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:2000;}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   #loading{text-align:center;padding:60px;color:var(--muted);}
+  /* VERSIONS MODAL */
+  #versions-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1500;align-items:center;justify-content:center;}
+  #versions-overlay.open{display:flex;}
+  #versions-modal{background:#101828;border:1px solid #2d3a5a;border-radius:14px;width:580px;max-width:calc(100vw - 32px);max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.7);}
+  #vm-header{padding:16px 20px;background:#141f35;border-bottom:1px solid #2d3a5a;display:flex;align-items:center;gap:10px;border-radius:14px 14px 0 0;}
+  #vm-header h3{margin:0;font-size:15px;flex:1;}
+  #vm-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;}
+  #vm-close:hover{color:#fff;}
+  #vm-body{flex:1;overflow-y:auto;padding:16px 20px;}
+  #vm-empty{color:var(--muted);text-align:center;padding:32px;font-size:13px;}
+  .version-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#141f35;border:1px solid #2d3a5a;border-radius:8px;margin-bottom:8px;}
+  .version-row:last-child{margin-bottom:0;}
+  .version-num{font-weight:700;font-family:monospace;color:#818cf8;min-width:34px;font-size:13px;}
+  .version-info{flex:1;font-size:13px;color:var(--text);}
+  .version-info small{display:block;color:var(--muted);font-size:11px;margin-top:2px;}
+  .btn-restore{padding:5px 10px;border-radius:5px;font-size:11.5px;font-weight:600;cursor:pointer;background:#14301a;border:1px solid #166534;color:#86efac;}
+  .btn-restore:hover{filter:brightness(1.2);}
+  .btn-del-v{padding:5px 10px;border-radius:5px;font-size:11.5px;font-weight:600;cursor:pointer;background:#2b1212;border:1px solid #7f1d1d;color:#fca5a5;}
+  .btn-del-v:hover{filter:brightness(1.2);}
 </style>
 </head>
 <body>
@@ -145,6 +164,8 @@
   <div class="admin-bar">
     <span>✏️ Modo edición activo — clic en <strong>▸</strong> para expandir, clic en el resto del nodo para editar</span>
     <button class="ctrl success" id="btn-publish" onclick="publishFlow()">☁️ Publicar cambios</button>
+    <button class="ctrl" id="btn-save-version" onclick="saveVersion(this)">💾 Guardar versión</button>
+    <button class="ctrl" onclick="openVersionsModal()">📋 Versiones</button>
     <button class="ctrl danger" onclick="resetFlow()">↺ Resetear al original</button>
   </div>
 
@@ -213,6 +234,21 @@
   <div id="ep-footer">
     <button id="ep-cancel">Cancelar</button>
     <button id="ep-save">💾 Guardar cambios</button>
+  </div>
+</div>
+
+<!-- VERSIONS MODAL -->
+<div id="versions-overlay">
+  <div id="versions-modal">
+    <div id="vm-header">
+      <h3>📋 Versiones del flujo</h3>
+      <button id="vm-close">✕</button>
+    </div>
+    <div id="vm-body">
+      <div id="vm-loading" style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Cargando...</div>
+      <div id="vm-list"></div>
+      <div id="vm-empty" style="display:none;">No hay versiones guardadas todavía.<br><small style="font-size:11px;margin-top:6px;display:block;">Usa "💾 Guardar versión" para crear un checkpoint del flujo actual.</small></div>
+    </div>
   </div>
 </div>
 
@@ -435,6 +471,96 @@ function showToast(msg){
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3500);
 }
+
+// ── Versiones ─────────────────────────────────────────────────
+async function saveVersion(btn){
+  const label=prompt('Nombre o descripción para esta versión (opcional):', '');
+  if(label===null)return;
+  if(!flowData){showToast('⚠️ No hay flujo cargado');return;}
+  const orig=btn.textContent;
+  btn.disabled=true;btn.textContent='⏳...';
+  try{
+    const res=await fetch('/api/flow/versions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':adminToken},
+      body:JSON.stringify({flow:flowData,label:label.trim()})
+    });
+    if(res.status===401){showToast('❌ Token inválido.');return;}
+    if(res.ok){
+      const j=await res.json();
+      const lbl=j.version.label?` "${j.version.label}"`:'';
+      showToast(`✅ Versión v${j.version.n}${lbl} guardada y publicada.`);
+    }else{
+      const j=await res.json();
+      showToast('❌ Error: '+(j.error||res.status));
+    }
+  }catch(e){showToast('❌ Error de red: '+e.message);}
+  finally{btn.disabled=false;btn.textContent=orig;}
+}
+
+async function openVersionsModal(){
+  document.getElementById('versions-overlay').classList.add('open');
+  document.getElementById('vm-loading').style.display='block';
+  document.getElementById('vm-list').innerHTML='';
+  document.getElementById('vm-empty').style.display='none';
+  await loadVersions();
+}
+function closeVersionsModal(){
+  document.getElementById('versions-overlay').classList.remove('open');
+}
+async function loadVersions(){
+  try{
+    const res=await fetch('/api/flow/versions');
+    const versions=await res.json();
+    document.getElementById('vm-loading').style.display='none';
+    const list=document.getElementById('vm-list');
+    list.innerHTML='';
+    if(!versions.length){document.getElementById('vm-empty').style.display='block';return;}
+    [...versions].reverse().forEach(v=>{
+      const date=new Date(v.savedAt).toLocaleString('es-GT',{dateStyle:'medium',timeStyle:'short'});
+      const row=document.createElement('div');
+      row.className='version-row';
+      row.innerHTML=`<span class="version-num">v${v.n}</span><div class="version-info">${v.label||'<em style="color:var(--muted)">sin nombre</em>'}<small>${date}</small></div><button class="btn-restore" onclick="restoreVersion(${v.n})">↩ Restaurar</button><button class="btn-del-v" onclick="deleteVersion(${v.n})">✕</button>`;
+      list.appendChild(row);
+    });
+  }catch(e){
+    document.getElementById('vm-loading').textContent='Error al cargar versiones.';
+  }
+}
+async function restoreVersion(n){
+  if(!confirm(`¿Restaurar versión v${n}? El flujo actual en producción será reemplazado.`))return;
+  try{
+    const res=await fetch(`/api/flow/versions/${n}/restore`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':adminToken}
+    });
+    if(res.status===401){showToast('❌ Token inválido.');return;}
+    if(res.ok){
+      const j=await res.json();
+      flowData=j.flow;
+      renderTree(null);
+      closeVersionsModal();
+      showToast(`✅ Versión v${n} restaurada y publicada.`);
+    }else{
+      const j=await res.json();
+      showToast('❌ Error: '+(j.error||res.status));
+    }
+  }catch(e){showToast('❌ Error de red: '+e.message);}
+}
+async function deleteVersion(n){
+  if(!confirm(`¿Eliminar la versión v${n}? Esta acción no se puede deshacer.`))return;
+  try{
+    const res=await fetch(`/api/flow/versions/${n}`,{
+      method:'DELETE',
+      headers:{'x-admin-token':adminToken}
+    });
+    if(res.ok){showToast(`🗑️ Versión v${n} eliminada.`);await loadVersions();}
+    else showToast('❌ Error al eliminar.');
+  }catch(e){showToast('❌ Error de red: '+e.message);}
+}
+document.getElementById('vm-close').onclick=closeVersionsModal;
+document.getElementById('versions-overlay').addEventListener('click',function(e){if(e.target===this)closeVersionsModal();});
+
 // Auto-login si hay token en session
 if(adminToken){
   document.getElementById('login-screen').style.display='none';

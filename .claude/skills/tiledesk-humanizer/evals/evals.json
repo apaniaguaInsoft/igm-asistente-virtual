@@ -1,0 +1,84 @@
+{
+  "skill_name": "tiledesk-humanizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quiero que apliques el Phase 1 del plan de mejora a los bloques globales del bot: menu_principal, bienvenida, defaultFallback y timeout_inactividad. Modifica el archivo 'IGM Web Asistente Virtual.json' con los nuevos textos humanizados.",
+      "expected_output": "Los 4 bloques globales deben tener textos reescritos: más cálidos, en tú, con intro conversacional. El JSON debe seguir siendo válido.",
+      "assertions": [
+        {
+          "text": "El texto de menu_principal ya no dice 'ayudarle' (usted) y tiene un saludo más cálido",
+          "check": "string_not_present",
+          "value": "ayudarle hoy"
+        },
+        {
+          "text": "El texto de bienvenida incluye 'Bienvenido/a' o similar que sea más inclusivo",
+          "check": "string_present",
+          "value": "Bienvenido/a"
+        },
+        {
+          "text": "El JSON resultante es sintácticamente válido",
+          "check": "valid_json",
+          "file": "IGM Web Asistente Virtual.json"
+        },
+        {
+          "text": "Los intent_id no fueron modificados",
+          "check": "string_present",
+          "value": "5c24130f-7a96-4760-a3dd-702ba95ab989"
+        }
+      ],
+      "files": ["IGM Web Asistente Virtual.json", "TILEDESK_FLOW_GUIDE.md"]
+    },
+    {
+      "id": 2,
+      "prompt": "Los bloques de handoff de agentes en el bot de IGM suenan muy cortantes cuando dicen que no hay agentes disponibles. Por ejemplo el bloque agente_no_disp_Pasaportes. Quiero que humanices todos los bloques agente_no_disp_* y agente_disp_* para que suenen más amigables y personalizados por departamento.",
+      "expected_output": "Los 8-10 bloques de handoff de agentes deben tener textos reescritos: agente_disp_* personalizado por departamento, agente_no_disp_* con más empatía. JSON válido.",
+      "assertions": [
+        {
+          "text": "Los bloques agente_disp_* incluyen el nombre del departamento en el mensaje",
+          "check": "manual",
+          "guidance": "Verificar que cada agente_disp_X menciona el departamento X en su texto"
+        },
+        {
+          "text": "El JSON resultante es sintácticamente válido",
+          "check": "valid_json",
+          "file": "IGM Web Asistente Virtual.json"
+        },
+        {
+          "text": "Los intent_id de los bloques de handoff no fueron modificados",
+          "check": "string_present",
+          "value": "63cdb68c-9168-4c6d-b6d6-37fd3b9c02b1"
+        }
+      ],
+      "files": ["IGM Web Asistente Virtual.json", "TILEDESK_FLOW_GUIDE.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "Quiero agregar el nuevo bloque psp_tramitar_por_primera_vez del Phase 2 del plan de mejora. Este bloque debe aparecer como opción en el menú psp_tramitar_adultos_menu y explicarle al usuario que es primera vez tramitando su pasaporte.",
+      "expected_output": "Un nuevo intent con display name psp_tramitar_por_primera_vez debe existir en el JSON con UUID nuevo, y el menú psp_tramitar_adultos_menu debe tener un botón que apunte a él. JSON válido.",
+      "assertions": [
+        {
+          "text": "El JSON contiene un intent con intent_display_name psp_tramitar_por_primera_vez",
+          "check": "string_present",
+          "value": "psp_tramitar_por_primera_vez"
+        },
+        {
+          "text": "El nuevo bloque tiene un intent_id UUID válido",
+          "check": "manual",
+          "guidance": "Verificar que intent_id es un UUID v4 válido y no está duplicado en el archivo"
+        },
+        {
+          "text": "El menú psp_tramitar_adultos_menu tiene un botón que apunta al nuevo bloque",
+          "check": "manual",
+          "guidance": "Buscar el intent psp_tramitar_adultos_menu y verificar que su buttons array tiene un action button que apunta al nuevo intent_id"
+        },
+        {
+          "text": "El JSON resultante es sintácticamente válido",
+          "check": "valid_json",
+          "file": "IGM Web Asistente Virtual.json"
+        }
+      ],
+      "files": ["IGM Web Asistente Virtual.json", "TILEDESK_FLOW_GUIDE.md"]
+    }
+  ]
+}

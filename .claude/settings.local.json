@@ -7,7 +7,17 @@
       "Bash(git fetch *)",
       "Bash(vercel --version)",
       "Bash(git *)",
-      "WebFetch(domain:igm.gob.gt)"
+      "WebFetch(domain:igm.gob.gt)",
+      "Bash(node *)",
+      "Bash(sort -u -t'\"' -k4)",
+      "Bash(mkdir -p /Users/apaniagua/Proyectos/asistente-virtual-igm/.claude/skills/skill-creator/tiledesk-humanizer-workspace/iteration-1/eval-1-global-blocks/with_skill/outputs)",
+      "Bash(mkdir -p /Users/apaniagua/Proyectos/asistente-virtual-igm/.claude/skills/skill-creator/tiledesk-humanizer-workspace/iteration-1/eval-1-global-blocks/without_skill/outputs)",
+      "Bash(mkdir -p /Users/apaniagua/Proyectos/asistente-virtual-igm/.claude/skills/skill-creator/tiledesk-humanizer-workspace/iteration-1/eval-2-agent-handoff/with_skill/outputs)",
+      "Bash(mkdir -p /Users/apaniagua/Proyectos/asistente-virtual-igm/.claude/skills/skill-creator/tiledesk-humanizer-workspace/iteration-1/eval-2-agent-handoff/without_skill/outputs)",
+      "Bash(mkdir -p /Users/apaniagua/Proyectos/asistente-virtual-igm/.claude/skills/skill-creator/tiledesk-humanizer-workspace/iteration-1/eval-3-new-block/with_skill/outputs)",
+      "Bash(python3 *)",
+      "Bash(uuidgen)",
+      "Bash(echo \"Exit: $?\")"
     ]
   }
 }

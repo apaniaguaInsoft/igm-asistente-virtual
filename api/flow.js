@@ -1,23 +1,82 @@
 const { Redis } = require('@upstash/redis');
 
-// GET  /api/flow        → devuelve el JSON del flujo
-// POST /api/flow        → guarda el JSON (requiere token admin)
-// POST /api/flow/reset  → resetea al default (requiere token admin)
+// GET  /api/flow                    → devuelve el JSON del flujo
+// POST /api/flow                    → guarda el JSON (requiere token admin)
+// POST /api/flow/reset              → resetea al default (requiere token admin)
+// GET  /api/flow/versions           → lista versiones guardadas
+// POST /api/flow/versions           → guarda versión + publica (requiere token admin)
+// POST /api/flow/versions/:n/restore → restaura versión N como flujo activo (requiere token admin)
+// DELETE /api/flow/versions/:n      → elimina snapshot de versión (requiere token admin)
 
 const kv = Redis.fromEnv();
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-token');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const url = req.url || '';
+
+  // ── VERSIONES ─────────────────────────────────────────────────
+  const vMatch = url.match(/\/versions(?:\/(\d+)(?:\/(restore))?)?(?:\?.*)?$/);
+  if (vMatch) {
+    const vNum = vMatch[1] ? parseInt(vMatch[1]) : null;
+    const action = vMatch[2];
+
+    if (req.method === 'GET') {
+      if (vNum === null) {
+        const versions = await kv.get('igm_flow_versions') || [];
+        return res.status(200).json(versions);
+      }
+      const data = await kv.get(`igm_flow_v${vNum}`);
+      if (!data) return res.status(404).json({ error: 'Versión no encontrada.' });
+      return res.status(200).json(data);
+    }
+
+    const token = req.headers['x-admin-token'];
+    if (!token || token !== process.env.ADMIN_TOKEN) {
+      return res.status(401).json({ error: 'Token inválido o ausente.' });
+    }
+
+    if (req.method === 'POST') {
+      if (vNum === null) {
+        const body = req.body;
+        if (!body || typeof body.flow !== 'object') {
+          return res.status(400).json({ error: 'Se requiere {flow, label}.' });
+        }
+        const versions = await kv.get('igm_flow_versions') || [];
+        const n = versions.length ? Math.max(...versions.map(v => v.n)) + 1 : 1;
+        const meta = { n, label: body.label || '', savedAt: new Date().toISOString() };
+        versions.push(meta);
+        await kv.set(`igm_flow_v${n}`, body.flow);
+        await kv.set('igm_flow_versions', versions);
+        await kv.set('igm_flow', body.flow);
+        return res.status(200).json({ ok: true, version: meta });
+      }
+      if (action === 'restore') {
+        const data = await kv.get(`igm_flow_v${vNum}`);
+        if (!data) return res.status(404).json({ error: 'Versión no encontrada.' });
+        await kv.set('igm_flow', data);
+        return res.status(200).json({ ok: true, flow: data });
+      }
+    }
+
+    if (req.method === 'DELETE' && vNum !== null && !action) {
+      const versions = await kv.get('igm_flow_versions') || [];
+      await kv.set('igm_flow_versions', versions.filter(v => v.n !== vNum));
+      await kv.del(`igm_flow_v${vNum}`);
+      return res.status(200).json({ ok: true });
+    }
+
+    return res.status(405).json({ error: 'Método no permitido.' });
+  }
 
   // ── GET: retorna flujo actual ──────────────────────────────────
   if (req.method === 'GET') {
     const data = await kv.get('igm_flow');
     if (!data) {
-      // Primera vez: guardar default y retornarlo
       await kv.set('igm_flow', DEFAULT_FLOW);
       return res.status(200).json(DEFAULT_FLOW);
     }
@@ -31,13 +90,11 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: 'Token inválido o ausente.' });
     }
 
-    const url = req.url || '';
     if (url.endsWith('/reset')) {
       await kv.set('igm_flow', DEFAULT_FLOW);
       return res.status(200).json({ ok: true, message: 'Flujo reseteado al original.' });
     }
 
-    // Guardar el flujo enviado
     const body = req.body;
     if (!body || typeof body !== 'object') {
       return res.status(400).json({ error: 'Body inválido. Se espera un objeto JSON.' });
