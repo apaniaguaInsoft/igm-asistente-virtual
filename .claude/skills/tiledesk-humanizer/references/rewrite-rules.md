@@ -14,6 +14,31 @@
 - Avoid neutral or mechanical intros ("Los requisitos son:") — replace with a sentence that shows the bot is helping ("Para el día de su cita, asegúrese de llevar:").
 - A message that reads like a government pamphlet should always be rewritten, even if the facts are correct.
 
+### Costs — integration rule
+Never present costs as a standalone section dropped after an unrelated intro. If the intro says "deberá presentar documentos" and the next line is a price list, the user doesn't know what they're paying for or when.
+
+**Rule:** When a block has multiple costs, or when the cost needs context to make sense, integrate it into a sentence that explains what the charge is for and when it applies.
+
+Bad:
+```
+Para solicitar residencia temporal, deberá presentar los documentos requeridos en el IGM.
+
+💰 Costo de estatus migratorio: USD 30.00
+💰 Cuota anual: USD 40.00
+```
+
+Good:
+```
+Para solicitar residencia temporal en Guatemala deberá presentar los documentos requeridos en el IGM. El trámite tiene dos cobros: USD 30.00 por el estatus migratorio (pago único al tramitar) y USD 40.00 de cuota anual que se renueva cada año mientras mantenga su residencia.
+```
+
+The key questions to answer when integrating costs:
+- ¿Es un pago único o recurrente?
+- ¿Qué se obtiene con ese pago?
+- ¿Se pagan juntos o en momentos distintos?
+
+If a block has only one cost and its purpose is obvious from context, a short inline mention is fine: "con un costo de 💰 USD 25.00".
+
 ### What NOT to do with usted
 - Do NOT use voseo ("usted" is correct; avoid "vos")
 - Do NOT use "ustedes" in singular — each message is to one user
@@ -26,12 +51,12 @@
 - Use `\n\n` between logical sections
 
 ### Title formatting
-When a message includes a title or heading, always format it in bold using Tiledesk's markdown syntax: `*título*` (single asterisks). This applies to section titles, sub-section labels, option headers, and any text that serves as a heading within a message.
+When a message includes a title or heading, always format it in bold using Tiledesk's markdown syntax: `**título**` (double asterisks). This applies to section titles, sub-section labels, option headers, and any text that serves as a heading within a message.
 
 **Examples:**
-- `*Documentos requeridos:*` (not plain `Documentos requeridos:`)
-- `*Paso 1 — Pago en Banrural*` (not plain `Paso 1 — Pago en Banrural`)
-- `*Opción A — Carta Consular:*` (not plain `Opción A — Carta Consular:`)
+- `**Documentos requeridos:**` (not plain `Documentos requeridos:`)
+- `**Paso 1 — Pago en Banrural**` (not plain `Paso 1 — Pago en Banrural`)
+- `**Opción A — Carta Consular:**` (not plain `Opción A — Carta Consular:`)
 
 This makes messages easier to scan in the chat bubble and creates a clear visual hierarchy between headings and body text.
 
@@ -207,11 +232,12 @@ Pattern to follow:
 
 **`ext_residencia_temporal`**
 ```
-Pattern to follow:
-- Open with: "Para solicitar residencia temporal en Guatemala, deberá presentar los siguientes documentos en el IGM:"
-- Then list the documents
-- Use usted forms: "deberá", "presentará", "podrá"
+Applied:
+Para solicitar residencia temporal en Guatemala deberá presentar los documentos requeridos en el IGM. El trámite tiene dos cobros: USD 30.00 por el estatus migratorio (pago único al tramitar) y USD 40.00 de cuota anual que se renueva cada año mientras mantenga su residencia.
+
+Puede descargar los formularios o iniciar su trámite por correo usando los botones de abajo:
 ```
+Note: costs were integrated into the intro sentence (not listed separately) — see "Costs — integration rule" above.
 
 ---
 

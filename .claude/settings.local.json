@@ -17,7 +17,8 @@
       "Bash(mkdir -p /Users/apaniagua/Proyectos/asistente-virtual-igm/.claude/skills/skill-creator/tiledesk-humanizer-workspace/iteration-1/eval-3-new-block/with_skill/outputs)",
       "Bash(python3 *)",
       "Bash(uuidgen)",
-      "Bash(echo \"Exit: $?\")"
+      "Bash(echo \"Exit: $?\")",
+      "Bash(awk -F'\"' '{print NR\": line \"$1\" → \"$4}')"
     ]
   }
 }
