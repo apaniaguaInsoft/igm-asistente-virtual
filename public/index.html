@@ -11,6 +11,7 @@
     --control:#f59e0b;--control-bg:#2b1d0c;--control-detail:#1f1408;
     --info:#14b8a6;--info-bg:#0c2624;--info-detail:#081b19;
     --agente:#ef4444;--agente-bg:#2b1212;--agente-detail:#1f0d0d;
+    --prh:#22c55e;--prh-bg:#0a2115;--prh-detail:#071510;
     --line:#334155;
   }
   *{box-sizing:border-box;}
@@ -40,8 +41,9 @@
   .cat-control{background:var(--control-bg);border-color:#a3690e;}.cat-control .id{color:var(--control);}
   .cat-info{background:var(--info-bg);border-color:#117f70;}.cat-info .id{color:var(--info);}
   .cat-agente{background:var(--agente-bg);border-color:#a32a2a;}.cat-agente .id{color:var(--agente);}
-  .cat-agente-pasaportes,.cat-agente-extranjeria,.cat-agente-control,.cat-agente-info{background:#160f20;border-color:#4b3a7a;}
-  .cat-agente-pasaportes .id,.cat-agente-extranjeria .id,.cat-agente-control .id,.cat-agente-info .id{color:#818cf8;}
+  .cat-prh{background:var(--prh-bg);border-color:#186b3a;}.cat-prh .id{color:var(--prh);}
+  .cat-agente-pasaportes,.cat-agente-extranjeria,.cat-agente-control,.cat-agente-info,.cat-agente-prh{background:#160f20;border-color:#4b3a7a;}
+  .cat-agente-pasaportes .id,.cat-agente-extranjeria .id,.cat-agente-control .id,.cat-agente-info .id,.cat-agente-prh .id{color:#818cf8;}
   .cat-root{background:#1e293b;border-color:#475569;}
   .detail{display:none;margin:10px 0 0 30px;padding:16px 18px;border-radius:12px;font-size:13px;max-width:800px;line-height:1.65;box-shadow:0 10px 28px rgba(0,0,0,.45);border:1px solid;position:relative;}
   .detail.open{display:block;}
@@ -51,8 +53,9 @@
   .detail-control{background:var(--control-detail);border-color:#a3690e;}.detail-control::before{border-right:13px solid var(--control-detail);}
   .detail-info{background:var(--info-detail);border-color:#117f70;}.detail-info::before{border-right:13px solid var(--info-detail);}
   .detail-agente{background:var(--agente-detail);border-color:#a32a2a;}.detail-agente::before{border-right:13px solid var(--agente-detail);}
-  .detail-agente-pasaportes,.detail-agente-extranjeria,.detail-agente-control,.detail-agente-info{background:#0e0b18;border-color:#4b3a7a;}
-  .detail-agente-pasaportes::before,.detail-agente-extranjeria::before,.detail-agente-control::before,.detail-agente-info::before{border-right:13px solid #0e0b18;}
+  .detail-prh{background:var(--prh-detail);border-color:#186b3a;}.detail-prh::before{border-right:13px solid var(--prh-detail);}
+  .detail-agente-pasaportes,.detail-agente-extranjeria,.detail-agente-control,.detail-agente-info,.detail-agente-prh{background:#0e0b18;border-color:#4b3a7a;}
+  .detail-agente-pasaportes::before,.detail-agente-extranjeria::before,.detail-agente-control::before,.detail-agente-info::before,.detail-agente-prh::before{border-right:13px solid #0e0b18;}
   .detail-root{background:#161f33;border-color:#475569;}.detail-root::before{border-right:13px solid #161f33;}
   .detail .section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:var(--muted);margin-bottom:6px;margin-top:12px;}
   .detail .section-label:first-child{margin-top:0;}
@@ -82,10 +85,11 @@
 <div class="legend">
   <div class="legend-group">
     <div class="legend-title">Categoría</div>
-    <span><span class="dot" style="background:var(--pasaportes)"></span>🛂 Pasaportes</span>
+    <span><span class="dot" style="background:var(--pasaportes)"></span>📘 Pasaportes</span>
     <span><span class="dot" style="background:var(--extranjeria)"></span>🌍 Extranjería</span>
     <span><span class="dot" style="background:var(--control)"></span>🛃 Control Migratorio</span>
     <span><span class="dot" style="background:var(--info)"></span>ℹ️ Información general</span>
+    <span><span class="dot" style="background:var(--prh)"></span>🏡 Plan Retorno al Hogar</span>
     <span><span class="dot" style="background:var(--agente)"></span>🧑‍💼 Agente humano</span>
   </div>
   <div class="legend-group">
