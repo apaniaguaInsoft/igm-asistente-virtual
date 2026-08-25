@@ -21,7 +21,8 @@
       "Bash(awk -F'\"' '{print NR\": line \"$1\" → \"$4}')",
       "Bash(awk -F: '{if \\($1 > 6820\\) print}')",
       "Bash(awk -F: '{if \\($1 > 6819 && $1 < 6870\\) print}')",
-      "Bash(awk 'NR%1==0')"
+      "Bash(awk 'NR%1==0')",
+      "Bash(pandoc --version)"
     ]
   }
 }
